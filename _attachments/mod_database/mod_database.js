@@ -94,9 +94,10 @@ var mod_database = (function() {
     spatialviews.miss = "function(doc){if(doc.layer){if(doc.layer=='miss'){emit(doc.geometry,doc);};};};";
     
     var lists = {}; 
+    // define the list function and convert it to a string to upload it as part of the design document to the database
     lists.all = function(head,req){
       start({'headers': {'content-type': 'text/comma-separated-values','Content-Disposition':'filename="'+req.query.key+'.csv"'} });
-      send("x,y,id,distance,typ\n");
+      send("x,y,id,partnerid,distance,typ\n");
       while (row = getRow() ){
         if(row.value.geometry.type == 'LineString'){
           var coor = row.value.geometry.coordinates[0];
@@ -105,7 +106,7 @@ var mod_database = (function() {
         }else if(row.value.geometry.type == 'Point'){
           var coor = row.value.geometry.coordinates;
         };
-        send(coor[0]+","+coor[1]+",'"+row.value._id+"',"+row.value.checkdistance+",'"+row.value.layer+"'\n");
+        send(coor[0].toFixed(8)+","+coor[1].toFixed(8)+",'"+row.value._id+"','"+row.value.partnerId+"',"+row.value.checkdistance.toFixed(8)+",'"+row.value.layer+"'\n");
       };
     };
     lists.all = lists.all.toString();

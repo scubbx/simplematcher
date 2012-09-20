@@ -37,7 +37,7 @@ var mod_legal = (function() {
       if(settings.comparativeInData){
         if(settings.comparativeOdblCompatible){
           return(true);
-        }else{ return(true); };
+        }else{ return(false); };
       }else{ return(true); };
     }, //allowResultDistribution
     
@@ -46,7 +46,7 @@ var mod_legal = (function() {
       if(settings.privateMode){ return(true)};
       if(settings.comparativeInDiagram){
         if(settings.comparativeOdblCompatible){
-          return(ture);
+          return(true);
         }else{ return(false);};
       }else{ return(true); };
     }, //allowStatCopy

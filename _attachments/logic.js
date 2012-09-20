@@ -8,9 +8,11 @@ settings.compview = undefined;
 settings.compcount = 0;
 
 var legalsettings = {};
-legalsettings.comparativeDbOdblCompatible = false;
-legalsettings.privateMode = false;
-legalsettings.comparativeInResult = true;
+legalsettings.privateMode = true;
+legalsettings.comparativeOdblCompatible = false;
+legalsettings.comparativeInData = true;
+legalsettings.comparativeInMap = true;
+legalsettings.comparativeInDiagram = true;
 
 var datas = {};
 var matchRunning = false;
@@ -313,24 +315,23 @@ function averageMinimumDistance(pointArray){
 
 
 function updateLegal(data){
-  console.log(data);
-  if(data=="private-no"){
+  if(data=="private:no"){
     legalsettings.privateMode = false;
   };
-  if(data=="private-yes"){
+  if(data=="private:yes"){
     legalsettings.privateMode = true;
   };
-  if(data=="comp-odbl-yes"){
-    legalsettings.comparativeDbOdblCompatible = true;
+  if(data=="comp-odbl:yes"){
+    legalsettings.comparativeOdblCompatible = true;
   };
-  if(data=="comp-odbl-no"){
-    legalsettings.comparativeDbOdblCompatible = false;
+  if(data=="comp-odbl:no"){
+    legalsettings.comparativeOdblCompatible = false;
   };
   if(data == "compinmap:true"){
-    legalsettings.comparativeInResult = true;
+    legalsettings.comparativeInMap = true;
   };
   if(data == "compinmap:false"){
-    legalsettings.comparativeInResult = false;
+    legalsettings.comparativeInMap = false;
   };
   refreshLegal();
 };

@@ -65,6 +65,7 @@ onmessage = function(message){
         checkelement.layer = "hit";
         checkelement.partnerId = result._id;
         result.partnerId = checkelement._id;
+        result.checkdistance = checkelement.checkdistance;
         result.layer = "hitc";
         alreadymatched_ids.push(result._id);
         finalcheckhit_c.push(result);

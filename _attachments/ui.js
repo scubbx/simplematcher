@@ -62,13 +62,15 @@ function refreshSearchPolygons(){
       success: function(data){
         //console.log("searchPolygons are: ");
         //console.log(data);
-        var outHtml = "<div id='radio_searchpolygons'><input name='radio_sp' type='radio' id='sp_inputdataset' checked='checked' onclick='selectMatchingArea()' ><label for='sp_inputdataset'>Create from Comparative Dataset</label>";
+        var outHtml = "<div id='radio_searchpolygons'>";
+        // the "create from comparative dataset function is deactivated for now
+        //var outHtml = "<div id='radio_searchpolygons'><input name='radio_sp' type='radio' id='sp_inputdataset' checked='checked' onclick='selectMatchingArea()' ><label for='sp_inputdataset'>Create from Comparative Dataset</label>";
         for(var i=0;i<data.rows.length;i++){
           var gjson = data.rows[i].value;
           var inputstring = "<input name='radio_sp' type='radio' id='sp_"+gjson.properties.name+"' >";
           var labelstring = "<label for='sp_"+gjson.properties.name+"' id='spl_"+gjson._id+"' onclick='selectMatchingArea( this.id.substring(4) )' onmouseout='clearLayer(previewLayer)' onmouseover='displayGjsonFromDb( this.id.substring(4) )' >"+gjson.properties.name+"</label>";
           var xinputstring = "<button id='xsp_"+gjson._id+"' onclick='removeBoundary( this.id.substring(4) );'>"+ "x" +"</button>";
-          outHtml += "<br/>"+inputstring+labelstring+"&nbsp;&nbsp;"+xinputstring;
+          outHtml += inputstring+labelstring+"&nbsp;&nbsp;"+xinputstring+"</br>";
         };
         $("#matchareaselect").html(outHtml);
         $( "#radio_searchpolygons" ).buttonset();
@@ -138,10 +140,16 @@ function refreshDatasets(){
 
 
 function refreshExport(){
+  console.log(mod_legal.allowDataCopy(legalsettings));
+  if (mod_legal.allowDataCopy(legalsettings)){
+    var linkbgcolor = "white";
+  }else{
+    var linkbgcolor = "red";
+  };
   var outhtml = "";
   outhtml += '<a href="http://127.0.0.1:5984/resultsdb/_design/'+appname+'/_list/all/simple?key=%22miss%22">CSV Download of missed OSM POIs</a></br>';
   outhtml += '<a href="http://127.0.0.1:5984/resultsdb/_design/'+appname+'/_list/all/simple?key=%22hit%22">CSV Download of matched OSM POIs</a></br>';
-  outhtml += '<a href="http://127.0.0.1:5984/resultsdb/_design/'+appname+'/_list/all/simple?key=%22hitc%22">CSV Download of matched Comparative POIs</a></br>';
+  outhtml += '<a style="background-color:'+linkbgcolor+';" href="http://127.0.0.1:5984/resultsdb/_design/'+appname+'/_list/all/simple?key=%22hitc%22">CSV Download of matched Comparative POIs</a></br>';
   
   $("#export-links").html(outhtml);
   $("#export-links").show();
@@ -159,12 +167,12 @@ function refreshLegal(){
   }else{
     var colormap = "red";
   };
-  if(mod_legal.allowResultDistribution(legalsettings)){
+  if(mod_legal.allowDataCopy(legalsettings)){
     var colorresults = "lightgreen";
   }else{
     var colorresults = "red";
   };
-  if(mod_legal.allowStatCopy(legalsettings)){
+  if(mod_legal.allowDiagramCopy(legalsettings)){
     var colorstats = "lightgreen";
   }else{
     var colorstats = "red";
@@ -172,9 +180,13 @@ function refreshLegal(){
   
   var legalhtmlprivate = "Private Mode: <b><font style='background-color:"+colorprivate+";'>"+legalsettings.privateMode+"</font></b></br>";
   var legalhtmlmap = "Reuse the current map view: <b><font style='background-color:"+colormap+";'>"+mod_legal.allowMapCopy(legalsettings)+"</font></b></br>";
-  var legalhtmlresults = "Reuse the data:  <b><font style='background-color:"+colorresults+";'>"+mod_legal.allowResultDistribution(legalsettings)+"</font></b></br>";
-  var legalhtmlstats = "Reuse the statistics:  <b><font style='background-color:"+colorstats+";'>"+mod_legal.allowStatCopy(legalsettings)+"</font></b></br>";
-  $("#legalinfo").html(legalhtmlprivate+legalhtmlmap+legalhtmlresults+legalhtmlstats);
+  var legalhtmlresults = "Reuse non OSM Results (CSV export):  <b><font style='background-color:"+colorresults+";'>"+mod_legal.allowDataCopy(legalsettings)+"</font></b></br>Reuse OSM Results (CSV export): <b><font style='background-color:lightgreen;'>true</font></b></br>";
+  var legalhtmlstats = "Reuse the statistics:  <b><font style='background-color:"+colorstats+";'>"+mod_legal.allowDiagramCopy(legalsettings)+"</font></b></br>";
+  if(legalsettings.privateMode){
+    $("#legalinfo").html(legalhtmlprivate+"Everything is allowed.");
+  }else{
+    $("#legalinfo").html(legalhtmlprivate+legalhtmlmap+legalhtmlresults+legalhtmlstats);
+  };
 }
 
 

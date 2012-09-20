@@ -20,7 +20,7 @@
         <ul>
           <li><a href="#map-tab">Map View</a></li>
           <li><a href="#stats-tab" onmousemove="$.sparkline_display_visible();">Statistics View</a></li>
-          <li><a href="#export-tab">Export View</a></li>
+          <li><a href="#export-tab">Data View (Export)</a></li>
         </ul>
         <div id="map-tab" style="height:600px; width:97%;">
           <div alt="Map is loading ..." id="map" style="height: 100%; width:100%"></div>
@@ -46,10 +46,6 @@
                   <div id="stat_user">&nbsp;</div>
                   <div>Points created by a single user (red=hit) (blue=miss)</div>
                 </td>
-                <td>
-                  <div id="stat_user_m" >&nbsp;</div>
-                  <div></div>
-                </td>
               </tr>
             </table>
           </div>
@@ -70,21 +66,24 @@
         </div>
         <h3><b><a href="#">(1) Define Comparative Dataset</a></b></h3>
         <div>
-          Choose an Available Dataset:
+          The comparative dataset is the data which will be used to compare the OSM database to.
+          <br/>Choose an available dataset:
           <p><div id="compselect" ></div></p>
           <p>Upload a new dataset:</p>
           <button id='createcomp' onclick="$('#dialog-upload').dialog('open')" >Add a dataset</button>
         </div>
         <h3><b><a href="#">(2) Define Categories</a></b></h3>
         <div>
-          Available category Definitions:
+          The category definition is the filter by which the entries of the OSM dataset are selected. It should correspond to the ontological description of your comparative dataset.
+          <br/>Available category definitions:
           <p><div id="viewselect"></div></p>
           <p>Create a new category definition:</p>
           <button id='createview' onclick="$('#dialog-category').dialog('open')" >New Selection</button>
         </div>
         <h3><b><a href="#">(3) Define Matching Area</a></b></h3>
         <div>
-          Available boundaries in the current extent:
+          The matching area is the extent you want to perform the matching on.
+          <br/>Available boundaries:
           <p><div id="matchareaselect"></div></p>
           <p>Define new extent:</p>
           <button id='createarea' onclick="$('#dialog-boundary').dialog('open')" >Add an area</button>
@@ -96,15 +95,15 @@
         </div>
         <h3><b><a href="#">(5) Define Legal Properties</a></b></h3>
         <div>
-          Is the comparative dataset compatible with the ODbL?
-          <div id='radio_odblCompatible' class="radios">
-            <input name='radio3' type='radio' onclick="updateLegal(this.id)" id='comp-odbl-yes'><label for='comp-odbl-yes' onclick='' onmouseout='' onmouseover='' >"yes"</label>
-            <input name='radio3' type='radio' id='comp-odbl-no' onclick="updateLegal(this.id)" checked='checked'><label for='comp-odbl-no' onclick='' onmouseout='' onmouseover=''>"no"</label>
-          </div>
           Do you want to operate in "Private Mode"?
           <div id='radio_private' class="radios">
-            <input name='radio4' type='radio' id='private-yes' onclick="updateLegal(this.id)"><label for='private-yes' onclick='' onmouseout='' onmouseover='' >"yes"</label>
-            <input name='radio4' type='radio' id='private-no' onclick="updateLegal(this.id)" checked='checked'><label for='private-no' onclick='' onmouseout='' onmouseover=''>"no"</label>
+            <input name='radio4' type='radio' id='private:yes' onclick="updateLegal(this.id)" checked='checked'><label for='private:yes' onclick='' onmouseout='' onmouseover='' >"yes"</label>
+            <input name='radio4' type='radio' id='private:no' onclick="updateLegal(this.id)"><label for='private:no' onclick='' onmouseout='' onmouseover=''>"no"</label>
+          </div>
+          Is the comparative dataset ODbL compatible?
+          <div id='radio_odblCompatible' class="radios">
+            <input name='radio3' type='radio' onclick="updateLegal(this.id)" id='comp-odbl:yes'><label for='comp-odbl:yes' onclick='' onmouseout='' onmouseover='' >"yes"</label>
+            <input name='radio3' type='radio' id='comp-odbl:no' onclick="updateLegal(this.id)" checked='checked'><label for='comp-odbl:no' onclick='' onmouseout='' onmouseover=''>"no"</label>
           </div>
         </div>
         <h3><b><a href="#">(6) Start Match!</a></b></h3>
@@ -127,7 +126,7 @@
         <div id="legalinfo">
         </div>
         <div>
-          <font style="color:grey;font-size:.8em;"></br>try deactivating the layer "Comparative Data"</font>
+          <font style="color:grey;font-size:.8em;"></br>Deactivate the layer "Comparative Data" and "Detailed Check Data" to only display OSM information in the map.<br/><br/>The legal recommendation given here only applies in a general manner. The actual situation may be different.</font>
         </div>
       </div>
     </div>
@@ -149,7 +148,7 @@
   <div id="dialog-category" title="Create New View">
     <p>
       Name of the new view:
-      <input type="text" id="viewnameToUpload" required >
+      <input type="text" id="viewnameToUpload" placeholder="view_name" required >
     </p>
     <p>
       Enter the code for a new view to filter POIs:
@@ -171,7 +170,7 @@ function(doc){
       <input type="text" placeholder="boundary name" id="newBoundaryName" required >
     </p>
     <p>
-      Enter the Polygon defining the boundary:
+      Enter the Polygon defining the boundary (only single polygons without holes are supported):
     </p>
     <textarea id="newBoundaryLineString" rows="12" cols="60" spellcheck="false" style="font-family:Courier New;font-size:110%">
 [[ [0,0] , [1,1] , [0,3] ]]

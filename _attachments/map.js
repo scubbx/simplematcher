@@ -2,7 +2,11 @@
 function initOpenLayers(){
   // map event listeners
   function mapLayerChanged(event){
-    updateLegal("compinmap:"+compLayer.visibility);
+    if(compLayer.visibility || checkdataLayer.visibility){
+      updateLegal("compinmap:true");
+    }else{
+      updateLegal("compinmap:false");
+    };
   };
   
   map = new OpenLayers.Map("map",{
