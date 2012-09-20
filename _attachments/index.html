@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<html>
+  <head>
+    <title>Simple Matcher</title>
+    <link rel="stylesheet" href="style/main.css" type="text/css">
+    <link type="text/css" href="style/smoothness/jquery-ui-1.8.23.custom.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="account">account</div>
+
+    <h1>Simple Matcher</h1>
+
+    <div id="infobar">
+      
+    </div>
+
+    <div id="content">
+      <div class="tabs" style="width:99%;" id="tabs-tab">
+        <ul>
+          <li><a href="#map-tab">Map View</a></li>
+          <li><a href="#stats-tab" onmousemove="$.sparkline_display_visible();">Statistics View</a></li>
+          <li><a href="#export-tab">Export View</a></li>
+        </ul>
+        <div id="map-tab" style="height:600px; width:97%;">
+          <div alt="Map is loading ..." id="map" style="height: 100%; width:100%"></div>
+        </div>
+        <div id="stats-tab" onmousemove="$.sparkline_display_visible();">
+          <div id="stat_text">You have to run an analysis first to get results.</div>
+          <div id="stats-view">
+            <table style="padding: 10px 10px;border-spacing: 40px 40px;" >
+              <tr>
+                <td>
+                  <div id="stat_mainpie">&nbsp;</div>
+                  <div>Hits (red) vs. Miss (blue) [OSM]</div>
+                </td>
+                <td>
+                  <div id="stat_mainpie_c">&nbsp;</div>
+                  <div>Hits (red) vs. Miss (blue) [Comp.]</div>
+                </td>
+              </tr>
+            </table>
+            <table style="padding: 10px 10px;border-spacing: 40px 40px;" >
+              <tr>
+                <td>
+                  <div id="stat_user">&nbsp;</div>
+                  <div>Points created by a single user (red=hit) (blue=miss)</div>
+                </td>
+                <td>
+                  <div id="stat_user_m" >&nbsp;</div>
+                  <div></div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div id="export-tab" >
+          <div id="export-links">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="sidebar">
+      <div id="accordion">
+        <h3><b><a href="#">Welcome</a></b></h3>
+        <div>
+          Welcome to the Simple Matcher.
+          <p>This Web-App lets you compare a set of OSM POIs defined by you with another dataset provided by you.</p>
+        </div>
+        <h3><b><a href="#">(1) Define Comparative Dataset</a></b></h3>
+        <div>
+          Choose an Available Dataset:
+          <p><div id="compselect" ></div></p>
+          <p>Upload a new dataset:</p>
+          <button id='createcomp' onclick="$('#dialog-upload').dialog('open')" >Add a dataset</button>
+        </div>
+        <h3><b><a href="#">(2) Define Categories</a></b></h3>
+        <div>
+          Available category Definitions:
+          <p><div id="viewselect"></div></p>
+          <p>Create a new category definition:</p>
+          <button id='createview' onclick="$('#dialog-category').dialog('open')" >New Selection</button>
+        </div>
+        <h3><b><a href="#">(3) Define Matching Area</a></b></h3>
+        <div>
+          Available boundaries in the current extent:
+          <p><div id="matchareaselect"></div></p>
+          <p>Define new extent:</p>
+          <button id='createarea' onclick="$('#dialog-boundary').dialog('open')" >Add an area</button>
+        </div>
+        <h3><b><a href="#">(4) Define Matching Radius</a></b></h3>
+        <div>
+          Enter the desired matching radius in degrees:
+          <input type="number" style="width:120px;" min="0.00001" max="0.02" step="0.00001" value="0.000225" onchange="updateRadius(parseFloat(this.value));">
+        </div>
+        <h3><b><a href="#">(5) Define Legal Properties</a></b></h3>
+        <div>
+          Is the comparative dataset compatible with the ODbL?
+          <div id='radio_odblCompatible' class="radios">
+            <input name='radio3' type='radio' onclick="updateLegal(this.id)" id='comp-odbl-yes'><label for='comp-odbl-yes' onclick='' onmouseout='' onmouseover='' >"yes"</label>
+            <input name='radio3' type='radio' id='comp-odbl-no' onclick="updateLegal(this.id)" checked='checked'><label for='comp-odbl-no' onclick='' onmouseout='' onmouseover=''>"no"</label>
+          </div>
+          Do you want to operate in "Private Mode"?
+          <div id='radio_private' class="radios">
+            <input name='radio4' type='radio' id='private-yes' onclick="updateLegal(this.id)"><label for='private-yes' onclick='' onmouseout='' onmouseover='' >"yes"</label>
+            <input name='radio4' type='radio' id='private-no' onclick="updateLegal(this.id)" checked='checked'><label for='private-no' onclick='' onmouseout='' onmouseover=''>"no"</label>
+          </div>
+        </div>
+        <h3><b><a href="#">(6) Start Match!</a></b></h3>
+        <div>
+          Start the Match and look at the results.
+          <button id='startMatchButton' onclick="startMatch();">Start Matching Procedure</button>
+          <p>
+            <div id="processmonitor">
+              <div id="processmonitor_title"></div>
+              <div id="processmonitor_process"></div>
+              <div id="processmonitor_process_bar"></div>
+            </div>
+          </p>
+        </div>
+      </div>
+      <div style="font-size:small; padding:5px 30px;">
+        <div id="legaltitle">
+          <p><b>Legal Recommendations</b></p>
+        </div>
+        <div id="legalinfo">
+        </div>
+        <div>
+          <font style="color:grey;font-size:.8em;"></br>try deactivating the layer "Comparative Data"</font>
+        </div>
+      </div>
+    </div>
+    
+  </body>
+  
+
+  <div id="dialog-upload" title="Upload Comparative Dataset">
+    <p>
+      Select a GeoJSON file to use: 
+      <input type="file" id="fileToUpload" onchange='$("#dbnameToUpload").val(this.files[0].name)'/>
+    </p>
+    <p>
+      Name the new comparative database: 
+      <input type="text" id="dbnameToUpload" required >
+    </p>
+  </div>
+  
+  <div id="dialog-category" title="Create New View">
+    <p>
+      Name of the new view:
+      <input type="text" id="viewnameToUpload" required >
+    </p>
+    <p>
+      Enter the code for a new view to filter POIs:
+    </p>
+    <textarea id="newCreatedView" rows="12" cols="60" spellcheck="false" style="font-family:Courier New;font-size:110%">
+function(doc){
+  if(doc.type && doc.geometry && doc.properties){
+    if(doc.type == 'Feature' && doc.properties.tags){
+      var tags = doc.properties.tags;
+      if( ENTER CONDITION HERE ){
+        emit(doc.geometry, doc);
+};};};};
+</textarea>
+  </div>
+  
+  <div id="dialog-boundary" title="Create New Search Boundary">
+    <p>
+      Name of the boundary:
+      <input type="text" placeholder="boundary name" id="newBoundaryName" required >
+    </p>
+    <p>
+      Enter the Polygon defining the boundary:
+    </p>
+    <textarea id="newBoundaryLineString" rows="12" cols="60" spellcheck="false" style="font-family:Courier New;font-size:110%">
+[[ [0,0] , [1,1] , [0,3] ]]
+</textarea>
+  </div>
+
+
+
+  <script src="/_utils/script/sha1.js"></script>
+  <script src="/_utils/script/json2.js"></script>
+  <script src="/_utils/script/jquery.js"></script>
+  <script src="/_utils/script/jquery.couch.js"></script>
+  <script src="vendor/couchapp/jquery.couchLogin.js"></script>
+  <script src="vendor/couchapp/jquery.couchProfile.js"></script>
+  <script src="vendor/couchapp/md5.js"></script>
+  <script src="vendor/couchapp/jquery.mustache.js"></script>
+  
+  <script type="text/javascript" src="vendor/couchapp/jquery-ui-1.8.23.custom.min.js"></script>
+  <script type="text/javascript" src="vendor/couchapp/OpenLayers.js"></script>
+  <script type="text/javascript" src="vendor/couchapp/jquery.sparkline.min.js"></script>
+  <script type="text/javascript" src="vendor/couchapp/jquery.qtip-1.0.0-rc3.min.js"></script>
+  
+  <script type="text/javascript" src="logic.js"></script>
+  <script type="text/javascript" src="ui.js"></script>
+  <script type="text/javascript" src="map.js"></script>
+  
+  <script type="text/javascript" src="mod_database/mod_database.js"></script>
+  <script type="text/javascript" src="mod_legal/mod_legal.js"></script>
+  <script src="mod_m_simple/mod_m_simple.js"></script>
+</html>
