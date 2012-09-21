@@ -24,6 +24,7 @@
         </ul>
         <div id="map-tab" style="height:600px; width:97%;">
           <div alt="Map is loading ..." id="map" style="height: 100%; width:100%"></div>
+          <div style="position:absolute; right:0px;">(red) OSM Point with a match   (blue) OSM Point without a match     (black) Comparative Dataset</div>
         </div>
         <div id="stats-tab" onmousemove="$.sparkline_display_visible();">
           <div id="stat_text">You have to run an analysis first to get results.</div>
@@ -192,6 +193,9 @@ function(doc){
   <script type="text/javascript" src="vendor/couchapp/OpenLayers.js"></script>
   <script type="text/javascript" src="vendor/couchapp/jquery.sparkline.min.js"></script>
   <script type="text/javascript" src="vendor/couchapp/jquery.qtip-1.0.0-rc3.min.js"></script>
+  <!--[if IE]>
+  <script type="text/javascript" src="vendor/couchapp/worker.js"></script>
+  <![endif]-->
   
   <script type="text/javascript" src="logic.js"></script>
   <script type="text/javascript" src="ui.js"></script>

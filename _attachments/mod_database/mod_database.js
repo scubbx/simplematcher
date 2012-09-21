@@ -53,7 +53,7 @@ var mod_database = (function() {
     requestPoints: function(dbname,viewname,bboxquery){
       var results;
       var query = "http://"+location.host+"/"+dbname+"/_design/"+appname+"/_spatial/"+viewname;
-      console.log(query);
+      //console.log(query);
       var request = createAJAX();
       request.open("GET", query+"?geometry="+bboxquery, false);
       request.send(null);
@@ -97,7 +97,11 @@ var mod_database = (function() {
     // define the list function and convert it to a string to upload it as part of the design document to the database
     lists.all = function(head,req){
       start({'headers': {'content-type': 'text/comma-separated-values','Content-Disposition':'filename="'+req.query.key+'.csv"'} });
-      send("x,y,id,partnerid,distance,typ\n");
+      if(req.query.key=="miss"){
+        send("x,y,id,typ\n");
+      }else{
+        send("x,y,id,partnerid,distance,typ\n");
+      };
       while (row = getRow() ){
         if(row.value.geometry.type == 'LineString'){
           var coor = row.value.geometry.coordinates[0];
@@ -106,7 +110,11 @@ var mod_database = (function() {
         }else if(row.value.geometry.type == 'Point'){
           var coor = row.value.geometry.coordinates;
         };
-        send(coor[0].toFixed(8)+","+coor[1].toFixed(8)+",'"+row.value._id+"','"+row.value.partnerId+"',"+row.value.checkdistance.toFixed(8)+",'"+row.value.layer+"'\n");
+        if(req.query.key=="miss"){
+          send(coor[0].toFixed(8)+","+coor[1].toFixed(8)+",'"+row.value._id+",'"+row.value.layer+"'\n");
+        }else{
+          send(coor[0].toFixed(8)+","+coor[1].toFixed(8)+",'"+row.value._id+"','"+row.value.partnerId+"',"+row.value.checkdistance.toFixed(8)+",'"+row.value.layer+"'\n");
+        };
       };
     };
     lists.all = lists.all.toString();

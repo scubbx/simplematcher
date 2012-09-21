@@ -69,7 +69,7 @@ function updateCompPreview(){
   };
   spatial += "))";
   $.getJSON(query+spatial, function(data){
-    console.log(data);
+    //console.log(data);
     // storing the number of points in the comparative dataset area
     settings.compcount=data.rows.length;
     var featureArray = [];

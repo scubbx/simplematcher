@@ -27,7 +27,7 @@ var mod_m_simple = (function() {
   return{
     start : function(checkarray,settings){
       module_status = 1;
-      console.log("mod_m_simple.start()");
+      //console.log("mod_m_simple.start()");
       checkarray = input2array(checkarray);
       
       // start the web-worker
@@ -113,16 +113,16 @@ var mod_m_simple = (function() {
   function input2array(geojsondata){
     // check if geojsondata is a FeatureCollection
     if (geojsondata.type == "FeatureCollection") {
-      console.log("mod_m_simple: detected FeatureCollection");
+      //console.log("mod_m_simple: detected FeatureCollection");
       return(geojsondata.features);
     } else if (geojsondata.type == "Feature") {
-      console.log("mod_m_simple: detected Feature");
+      //console.log("mod_m_simple: detected Feature");
       // if there is only one geoJSON feature, return it as an array
       var gtype = geojsondata.geometry.type;
       if (gtype == "Point" || gtype == "Polygon" || gtype == "LineString") {
         return( [geojsondata] );
       } else {
-        console.log("mod_m_simple: detected unsupported Type: " + gtype);
+        //console.log("mod_m_simple: detected unsupported Type: " + gtype);
         // non of the above, nothing to do
         return([]);
       };

@@ -17,7 +17,10 @@ legalsettings.comparativeInDiagram = true;
 var datas = {};
 var matchRunning = false;
 var appname = "simplematcher";
-var databasename = "simplematcher_aut";
+//var databasename = "simplematcher";
+var databasename = getDbNameFromLocation();
+
+var map;
 
 $(function() {
   $db_osm = $.couch.db(databasename);
@@ -40,29 +43,24 @@ function getEmptyGeoJSON(gjsontype){
   return({type:"Feature",properties:{},geometry:{type:gjsontype,coordinates:[]}});
 };
 
-function calculateMatchingArea(){
-  
+// this function only works as long as location.pathname contains the name of the database
+function getDbNameFromLocation(){
+  var databasename = location.pathname.split("/")[1];
+  return(databasename);
 };
 
-
 function selectMatchingArea(elementId){
-  if(elementId != undefined){
-    $db_osm.openDoc(elementId, {
-      success: function(data){
-        settings.matchingArea = data.geometry.coordinates[0];
-        settings.matchingAreaName = data.properties.name;
-        console.log("selected: "+data.properties.name);
-        updateInfobar();
-      },
-      error: function(status){
-        alert(status);
-      }
-    });
-  } else {
-    // if it has no geometry build the extent from the input polygons
-    calculateMatchingArea();
-    console.log("selected: buid from extent");
-  };
+  $db_osm.openDoc(elementId, {
+    success: function(data){
+      settings.matchingArea = data.geometry.coordinates[0];
+      settings.matchingAreaName = data.properties.name;
+      //console.log("selected: "+data.properties.name);
+      updateInfobar();
+    },
+    error: function(status){
+      alert(status);
+    }
+  });
 };
 
 
@@ -99,7 +97,7 @@ function removeDb(dbname){
 
 function selectDb(dbname){
   settings.compdb = dbname;
-  console.log("selected: " + settings.compdb);
+  //console.log("selected: " + settings.compdb);
   updateInfobar();
 };
 
@@ -125,7 +123,7 @@ function removeCategory(viewname){
 
 function selectCategory(categoryname){
   settings.compview = categoryname;
-  console.log("selected: " + settings.compview);
+  //console.log("selected: " + settings.compview);
   updateInfobar();
 };
 
@@ -230,7 +228,7 @@ function prepareCheckarray(){
 };
 
 function startMatch(){
-  console.log(matchRunning);
+  //console.log(matchRunning);
   if(matchRunning == true){
     alert("Match is already running.");
     return(0);
@@ -275,7 +273,12 @@ function checkFinished(matchResults){
   console.log(matchResults);
   updateStatus({title : "Matching of "+settings.matchingAreaName+" finished.", status : "Matched <b>"+matchResults.hit.length+"</b> from possible <b>"+(matchResults.hit.length+matchResults.miss.length)+" OSM points</b> / <b>"+settings.compcount+" Comp. Points</b>."});
   matchRunning = false;
-  var gjson = {type:"FeatureCollection",features: matchResults.hit.concat(matchResults.miss).concat(matchResults.hitc) }
+  // only include the comparative data when legally possible
+  if (mod_legal.allowDataCopy(legalsettings)){
+    var gjson = {type:"FeatureCollection",features: matchResults.hit.concat(matchResults.miss).concat(matchResults.hitc) };
+  }else{
+    var gjson = {type:"FeatureCollection",features: matchResults.hit.concat(matchResults.miss) };
+  };
   $.couch.db("resultsdb").drop();
   mod_database.createDatabase( "resultsdb", gjson);
   createDiagrams(matchResults);
