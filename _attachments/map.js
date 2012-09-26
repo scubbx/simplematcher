@@ -90,8 +90,8 @@ function displayGjsonFromDb(id){
       clearLayer(previewLayer);
       gjsonToMap(data);
     },
-    error: function(status){
-      alert(status);
+    error: function(status,statusText,errorText){
+      alert(status+": "+errorText);
     }
   });
 };

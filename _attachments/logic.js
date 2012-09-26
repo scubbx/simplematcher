@@ -12,14 +12,13 @@ legalsettings.privateMode = true;
 legalsettings.comparativeOdblCompatible = false;
 legalsettings.comparativeInData = true;
 legalsettings.comparativeInMap = true;
-legalsettings.comparativeInDiagram = true;
+legalsettings.comparativeInDiagram = false;
 
 var datas = {};
 var matchRunning = false;
 var appname = "simplematcher";
 //var databasename = "simplematcher";
 var databasename = getDbNameFromLocation();
-
 var map;
 
 $(function() {
@@ -57,8 +56,8 @@ function selectMatchingArea(elementId){
       //console.log("selected: "+data.properties.name);
       updateInfobar();
     },
-    error: function(status){
-      alert(status);
+    error: function(status,statusText,errorText){
+      alert(status+": "+errorText);
     }
   });
 };
@@ -113,8 +112,8 @@ function removeCategory(viewname){
         success: function(data){
           refreshViews();
         },
-        error: function(status){
-          alert(status);
+        error: function(status,statusText,errorText){
+          alert(status+": "+errorText);
         }
       });
     };
@@ -142,8 +141,8 @@ function uploadCategoryToDb(viewname,view){
           refreshViews();
           //alert("Selection is initialized - this may take some minutes");
         },
-        error: function(status){
-          alert(status);
+        error: function(status,statusText,errorText){
+          alert(status+": "+errorText);
         }
       });
     };
@@ -162,8 +161,8 @@ function addNewBoundary(boundaryName, boundaryLineString){
       //alert("saved");
       console.log(data);
     },
-    error: function(status){
-      alert(status);
+    error: function(status,statusText,errorText){
+      alert(status+": "+errorText);
     }
   });
 };
@@ -178,8 +177,8 @@ function removeBoundary( boundaryId){
           console.log(data);
           refreshSearchPolygons();
         },
-        error: function(status){
-          alert(status);
+        error: function(status,statusText,errorText){
+          alert(status+": "+errorText);
         }
       });
     }

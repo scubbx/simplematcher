@@ -56,7 +56,7 @@ onmessage = function(message){
         if(checksettings.radiussearch == true &&
               checkelement.geometry.type == "Point" &&
               checkelement.checkdistance > checksettings.searchradius){
-          consolelog("IN BBOX BUT NOT IN RADIUS");
+          consolelog("IN BBOX BUT NOT IN RADIUS: "+checkelement._id);
           checkelement.layer = "miss";
           finalcheckmiss.push(checkelement);
           pushToMap(checkelement);

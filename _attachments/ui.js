@@ -75,8 +75,8 @@ function refreshSearchPolygons(){
         $("#matchareaselect").html(outHtml);
         $( "#radio_searchpolygons" ).buttonset();
       },
-      error: function(status){
-        alert(status);
+      error: function(status,statusText,errorText){
+        alert(status+": "+errorText);
         $("#matchareaselect").html("--- no areas found ---");
       },
       reduce: false
