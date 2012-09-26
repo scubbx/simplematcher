@@ -111,7 +111,7 @@ var mod_database = (function() {
           var coor = row.value.geometry.coordinates;
         };
         if(req.query.key=="miss"){
-          send(coor[0].toFixed(8)+","+coor[1].toFixed(8)+",'"+row.value._id+",'"+row.value.layer+"'\n");
+          send(coor[0].toFixed(8)+","+coor[1].toFixed(8)+",'"+row.value._id+"','"+row.value.layer+"'\n");
         }else{
           send(coor[0].toFixed(8)+","+coor[1].toFixed(8)+",'"+row.value._id+"','"+row.value.partnerId+"',"+row.value.checkdistance.toFixed(8)+",'"+row.value.layer+"'\n");
         };
