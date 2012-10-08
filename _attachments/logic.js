@@ -57,7 +57,7 @@ function selectMatchingArea(elementId){
       updateInfobar();
     },
     error: function(status,statusText,errorText){
-      alert(status+": "+errorText);
+      alert(status+": "+statusText+" - "+errorText);
     }
   });
 };
@@ -79,12 +79,12 @@ function uploadFileToDb(file){
       console.log(newDbName);
       if(newDbName != undefined){
         mod_database.createDatabase("comp_"+newDbName,JSON.parse(upGjson));
-        refreshDatasets();
       };
     };
   })(file);
   
   reader.readAsText(file);
+  //refreshDatasets();
 };
 
 function removeDb(dbname){
@@ -96,7 +96,6 @@ function removeDb(dbname){
 
 function selectDb(dbname){
   settings.compdb = dbname;
-  //console.log("selected: " + settings.compdb);
   updateInfobar();
 };
 
@@ -105,7 +104,7 @@ function removeCategory(viewname){
   $db_osm.allApps({eachApp: function(appName, appPath, ddoc){
     if(appName==appname){
       var spatialviews = ddoc.spatial;
-      console.log(viewname);
+      //console.log(viewname);
       delete spatialviews[viewname];
       ddoc.spatial = spatialviews;
       $db_osm.saveDoc(ddoc, {
@@ -113,7 +112,7 @@ function removeCategory(viewname){
           refreshViews();
         },
         error: function(status,statusText,errorText){
-          alert(status+": "+errorText);
+          alert(status+": "+statusText+" - "+errorText);
         }
       });
     };
@@ -122,12 +121,10 @@ function removeCategory(viewname){
 
 function selectCategory(categoryname){
   settings.compview = categoryname;
-  //console.log("selected: " + settings.compview);
   updateInfobar();
 };
 
 function uploadCategoryToDb(viewname,view){
-  //console.log(viewname);
   $db_osm.allApps({eachApp: function(appName, appPath, ddoc){
     if(appName==appname){
       var spatialviews = ddoc.spatial;
@@ -139,10 +136,10 @@ function uploadCategoryToDb(viewname,view){
       $db_osm.saveDoc(ddoc, {
         success: function(data){
           refreshViews();
-          //alert("Selection is initialized - this may take some minutes");
+          alert("Selection is initialized - this may take some time");
         },
         error: function(status,statusText,errorText){
-          alert(status+": "+errorText);
+          alert(status+": "+statusText+" - "+errorText);
         }
       });
     };
@@ -162,25 +159,28 @@ function addNewBoundary(boundaryName, boundaryLineString){
       console.log(data);
     },
     error: function(status,statusText,errorText){
-      alert(status+": "+errorText);
+      alert(status+": "+statusText+" - "+errorText);
     }
   });
 };
 
 
 
-function removeBoundary( boundaryId){
+function removeBoundary(boundaryId){
   $db_osm.openDoc(boundaryId, {
     success: function(data){
       $db_osm.removeDoc(data, {
         success: function(data){
-          console.log(data);
+          //console.log(data);
           refreshSearchPolygons();
         },
         error: function(status,statusText,errorText){
-          alert(status+": "+errorText);
+          alert(status+": "+statusText+" - "+errorText);
         }
       });
+    },
+    error: function(status,statusText,errorText){
+      alert(status+": "+statusText+" - "+errorText);
     }
   });
 };
@@ -207,7 +207,6 @@ function prepareCheckarray(){
   var i=0;
   var bboxquery = "POLYGON((";
   var arrayMatchingArea = eval("["+settings.matchingArea+"]");
-  //console.log(arrayMatchingArea);
   while(i<arrayMatchingArea.length){
     if(i != 0){
       bboxquery += ",";
@@ -217,17 +216,14 @@ function prepareCheckarray(){
     i++;
     bboxquery += arrayMatchingArea[i].toFixed(5);
     i++;
-    //console.log(i);
   };
   bboxquery += ","+arrayMatchingArea[0].toFixed(5)+"+"+arrayMatchingArea[1].toFixed(5);
   bboxquery += "))";
-  //console.log(bboxquery);
   var checkarray = mod_database.requestPoints($db_osm.name,settings.compview,bboxquery);
   return(checkarray);
 };
 
 function startMatch(){
-  //console.log(matchRunning);
   if(matchRunning == true){
     alert("Match is already running.");
     return(0);
@@ -242,12 +238,9 @@ function startMatch(){
   var checkarray = prepareCheckarray();
   var gjson = {"type":"FeatureCollection","features":checkarray};
   settings.connectionstring = "http://"+location.host+"/"+settings.compdb+"/_design/"+appname+"/_spatial/simple";
-  //console.log(settings);
   $("#processmonitor_process_bar").show();
-  
   $("#stats-view").hide();
   $("#export-links").hide();
-  
   clearLayer(hitLayer);
   clearLayer(missLayer);
   clearLayer(checkdataLayer);
@@ -255,18 +248,6 @@ function startMatch(){
   mod_m_simple.start(gjson, settings);
 };
 
-function incrementRev(rev){
-  for(var i=0;i<rev.length;i++){
-    if(rev[i] == "-"){
-      var found = i;
-      break;
-    };
-  };
-  var num = rev.substring(0,i);
-  var hash = rev.substring(i+1);
-  var newrev = (parseInt(num)+1) + "-" + hash;
-  return(newrev);
-};
 
 function checkFinished(matchResults){
   console.log(matchResults);
@@ -278,42 +259,12 @@ function checkFinished(matchResults){
   }else{
     var gjson = {type:"FeatureCollection",features: matchResults.hit.concat(matchResults.miss) };
   };
+  // delete a possibly already existing resutls-database
   $.couch.db("resultsdb").drop();
   mod_database.createDatabase( "resultsdb", gjson);
   createDiagrams(matchResults);
   refreshExport();
 };
-
-
-
-
-function averageMinimumDistance(pointArray){
-  var columni = 0;
-  var columnarray = [];
-  // for every row
-  for(columni;columni<pointArray.length;columni++){
-    console.log("Column: "+columni);
-    var element = pointArray[columni];
-    var rowi = 0;
-    var columnsum = 0;
-    for(rowi;rowi<pointArray.length;rowi++){
-      // don't use the element with itself
-      if(rowi != columni){
-        var currentdistance = calcDistance(pointArray[columni],pointArray[rowi]);
-        columnsum += currentdistance;
-      };
-    };
-    columnarray.push(columnsum/pointArray.length);
-  };
-
-  var amd = 0;
-  for(var i=0;i<columnarray.length;i++){
-    amd += columnarray[i];
-    amd = amd / pointArray.length;
-  };
-  return(amd);
-};
-
 
 
 function updateLegal(data){
@@ -337,29 +288,5 @@ function updateLegal(data){
   };
   refreshLegal();
 };
-
-
-
-
-// calculates plain distance between two pairs of coordinates
-function calcDistance(p1,p2){
-  // convert to radiants
-  lon1 = p1[0] * Math.PI / 180;
-  lat1 = p1[1] * Math.PI / 180;
-  lon2 = p2[0] * Math.PI / 180;
-  lat2 = p2[1] * Math.PI / 180;
-  
-  var x = (lon2-lon1) * Math.cos((lat1+lat2)/2);
-  var y = (lat2-lat1);
-  // var R = 6371000; // Radius of the earth in m
-  // var d = Math.sqrt(x*x + y*y) * R; // necessary if distance wanted in m
-  var d = Math.sqrt(x*x + y*y)
-  
-  // convert radiants back to degrees
-  d = d * 180 / Math.PI;
-  return(d);
-};
-
-
 
 

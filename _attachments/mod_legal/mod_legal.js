@@ -1,5 +1,6 @@
 /* This file is part of the master-thesis
- * "xxx".
+ * "A Web-Based System for Comparative Analysis of OpenStreetMap
+ * Data by the use of CouchDB" by Markus Mayr.
  * 
  * This module gives recommendations on what is allowed with certain
  * results. The input has to be some settings describing the data and

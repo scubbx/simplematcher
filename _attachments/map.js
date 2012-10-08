@@ -53,7 +53,6 @@ function clearLayer(layerobject){
   layerobject.removeAllFeatures();
 };
 
-
 // request all data from the comparative dataset in the specified area and show it on the map
 function updateCompPreview(){
   var query = "http://"+location.host+"/"+settings.compdb+"/_design/"+appname+"/_spatial/simple";
@@ -69,7 +68,6 @@ function updateCompPreview(){
   };
   spatial += "))";
   $.getJSON(query+spatial, function(data){
-    //console.log(data);
     // storing the number of points in the comparative dataset area
     settings.compcount=data.rows.length;
     var featureArray = [];
@@ -81,7 +79,7 @@ function updateCompPreview(){
   });
 };
 
-
+// loads a document by its ID and displays the content in the map
 function displayGjsonFromDb(id){
   $db_osm.openDoc(id, {
     success: function(data){
@@ -91,13 +89,12 @@ function displayGjsonFromDb(id){
       gjsonToMap(data);
     },
     error: function(status,statusText,errorText){
-      alert(status+": "+errorText);
+      alert(status+": "+statusText+" - "+errorText);
     }
   });
 };
 
-
-
+// sort the incoming GeoJSON by its layer-field and display in on the map
 function gjsonToMap(gjson){
   if (gjson.layer == "hit") {
     hitLayer.addFeatures(geojsonFormat.read(gjson));

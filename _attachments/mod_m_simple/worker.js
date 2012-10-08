@@ -1,12 +1,18 @@
 /* This file is part of the master-thesis
- * "xxx".
+ * "A Web-Based System for Comparative Analysis of OpenStreetMap
+ * Data by the use of CouchDB" by Markus Mayr.
  * 
  * This is the WebWorker that performs the actual check for location
  * 
  * 
  * REQUIREMENTS:
- * 
+ * - corresponding "mod_m_simple.js"
  *
+ * MODULE INTERFACE:
+ * - { command: "start", content: [ARRAY OF GeoJSON], connection: [URI to spatial view], checksettings: [settings-object] }
+ * - { command: "stop" }
+ * - { command: "status" }
+ * 
  */
 
 var statuslen = 0;

@@ -1,5 +1,5 @@
 /* This file is part of the master-thesis
- * "A Web-Based System for Comparitative Analysis of OpenStreetMap
+ * "A Web-Based System for Comparative Analysis of OpenStreetMap
  * Data by the use of CouchDB" by Markus Mayr.
  * 
  * This module performs a simplified check for location between two
@@ -95,7 +95,7 @@ var mod_m_simple = (function() {
     } //stop
   }; //return
 
-// draws a circle or a box around a specified feature and pushes it to the map
+  // draws a circle or a box around a specified feature and pushes it to the map
   function drawSearchExtent(feature){
     if (settings.radiussearch){
       // build a circle
@@ -109,7 +109,7 @@ var mod_m_simple = (function() {
     gjsonToMap(bboxgjson); //this function must be present externally
   };
 
-// transforms a FeatureCollecton to an array of geoJSON objects
+  // transforms a FeatureCollecton to an array of geoJSON objects
   function input2array(geojsondata){
     // check if geojsondata is a FeatureCollection
     if (geojsondata.type == "FeatureCollection") {
@@ -132,7 +132,7 @@ var mod_m_simple = (function() {
     };
   };
 
-// builds a geoJSON polygon describing a box around a point
+  // builds a geoJSON polygon describing a box around a point
   function buildGjsonBox(point,extent){
     cPoint = point.geometry.coordinates;
     if(point.geometry.type == "LineString"){
@@ -175,7 +175,7 @@ var mod_m_simple = (function() {
     
   };
 
-// builds a geoJSON polygon describing a circle around a point
+  // builds a geoJSON polygon describing a circle around a point
   function buildRadius(point,extent){
     // a radius search makes only sense when the element is a single point
     // this function is solely for generating a visual representation
@@ -206,7 +206,7 @@ var mod_m_simple = (function() {
     };
   };
   
-// get the smallest entry of an array
+  // get the smallest entry of an array
   function getMin(inarray){
     var outvalue = inarray[0];
     for(var i=0;i<inarray.length;i++){
@@ -215,7 +215,7 @@ var mod_m_simple = (function() {
     return(outvalue);
   };
 
-// get the biggest entry of an array
+  // get the biggest entry of an array
   function getMax(inarray){
     var outvalue = inarray[0];
     for(var i=0;i<inarray.length;i++){

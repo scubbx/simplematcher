@@ -1,7 +1,7 @@
+// initialize bindings for jQuery UI objects and define parameters for modal dialogues
 function initJQueryUi(){
   $("#accordion").accordion({autoHeight:false});
   $(".tabs").tabs();
-  //$( "#radio" ).buttonset();
   $("button").button();
   $(".radios").buttonset();
   $("#processmonitor_process_bar").progressbar({value: 0});
@@ -14,6 +14,7 @@ function initJQueryUi(){
                                   buttons: {
                                     "Upload & Create Database": function() {
                                       // the jQuery method allows no access to ".files[0]"
+                                      alert("The upload may take some time. The dataset will become visible when the upload has finished.");
                                       uploadFileToDb( document.getElementById("fileToUpload").files[0] );
                                       $( this ).dialog( "close" );
                                     },
@@ -56,12 +57,10 @@ function initJQueryUi(){
 
 };
 
-
+// updates the list of selectable search-areas (documents with type=SearchPolygon)
 function refreshSearchPolygons(){
   $db_osm.view(appname+"/searchpolygons", {
       success: function(data){
-        //console.log("searchPolygons are: ");
-        //console.log(data);
         var outHtml = "<div id='radio_searchpolygons'>";
         // the "create from comparative dataset function is deactivated for now
         //var outHtml = "<div id='radio_searchpolygons'><input name='radio_sp' type='radio' id='sp_inputdataset' checked='checked' onclick='selectMatchingArea()' ><label for='sp_inputdataset'>Create from Comparative Dataset</label>";
@@ -76,15 +75,14 @@ function refreshSearchPolygons(){
         $( "#radio_searchpolygons" ).buttonset();
       },
       error: function(status,statusText,errorText){
-        alert(status+": "+errorText);
+        alert(status+": "+statusText+" - "+errorText);
         $("#matchareaselect").html("--- no areas found ---");
       },
       reduce: false
   });
 };
 
-
-
+// updates the list of selectable categories (spatial views stored in the design document)
 function refreshViews(){
   $db_osm.allApps({eachApp: function(appName, appPath, ddoc){
     var spatialViews;
@@ -116,6 +114,7 @@ function refreshViews(){
   }});
 };
 
+// updates the list of selectable comparative datasets (databases with a leading "comp_" in their name)
 function refreshDatasets(){
   $.couch.allDbs({success: function(databases){
       var outHtml = "<div id='radio_comp'>";
@@ -137,8 +136,7 @@ function refreshDatasets(){
   });
 };
 
-
-
+// update the list of links to download the results
 function refreshExport(){
   console.log(mod_legal.allowDataCopy(legalsettings));
   if (mod_legal.allowDataCopy(legalsettings)){
@@ -155,7 +153,7 @@ function refreshExport(){
   $("#export-links").show();
 };
 
-
+// updates the display of legal advices
 function refreshLegal(){
   if(legalsettings.privateMode){
     var colorprivate = "lightgreen";
@@ -189,18 +187,17 @@ function refreshLegal(){
   };
 }
 
-
-
-
+// updates the diagrams in the statistics page
 function createDiagrams(data){
   $("#stat_text").html("");
-  
+  // build the first pie diagram
   $("#stat_mainpie").sparkline( [data.miss.length,data.hit.length] , {
     type: 'pie',
     width: '300',
     height: '300',
     sliceColors: ['#56aaff','#ff5656']
   });
+  // build the second pie diagram
   $("#stat_mainpie_c").sparkline( [(settings.compcount-data.hit.length),data.hit.length] , {
     type: 'pie',
     width: '300',
@@ -209,6 +206,7 @@ function createDiagrams(data){
   });
   
   // build the aggregated users list
+  // first: hit-data
   var usercollection = {};
   for (var i=0;i<data.hit.length;i++){
     var username = data.hit[i].properties.user;
@@ -223,7 +221,7 @@ function createDiagrams(data){
       usercollection[username].hit = 1;
     };
   };
-
+  // second: miss-data
   for (var i=0;i<data.miss.length;i++){
     var username = data.miss[i].properties.user;
     if(usercollection[username]){
@@ -238,14 +236,16 @@ function createDiagrams(data){
     };
   };
   
+  // build the array containing the final numbers for the bar diagram
   var baruserdata = [];
   for(user in usercollection){
     if(!usercollection[user].hit){usercollection[user].hit = 0};
     if(!usercollection[user].miss){usercollection[user].miss = 0};
     baruserdata.push([(usercollection[user].miss*-1),usercollection[user].hit])
   };
-  // the tabs-tab is taken because the stats-tab has no width yet
+  // the tabs-tab is used because the stats-tab has no width yet
   var barwidth = ($("#tabs-tab").width()*0.9) / (baruserdata.length+1);
+  // build the bar diagram
   $("#stat_user").sparkline( baruserdata, {
     type: 'bar',
     height: '50',
@@ -257,14 +257,12 @@ function createDiagrams(data){
   $("#stats-view").show();
 };
 
-
-
+// updates the infobar at the top of the page and colours it green if enough information is available
 function updateInfobar(){
   if((settings.compdb) && (settings.compview) && (settings.matchingArea.length > 0) && (settings.searchradius)){
     oke = true;
     $("#infobar").css('background','lightgreen');
     updateCompPreview();
-    //settings.compcount = mod_database.getDocCountInDb(settings.compdb,"simple");
   } else {
     $("#infobar").css('background','#fee');
   };
